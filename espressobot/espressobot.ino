@@ -19,8 +19,8 @@ void initServo(Servo &theServo)
 
 void setup()
 {
-  byte numDigits = 4;                                              //Hier wird die Anzahl der Ziffern angegeben
-  byte digitPins[] = {2, 3, 4, 5};                                 //Die Pins zu den Ziffern werden festgelegt
+  byte numDigits = 2;                                              //Hier wird die Anzahl der Ziffern angegeben
+  byte digitPins[] = {4, 5, 2, 3};                                 //Die Pins zu den Ziffern werden festgelegt
   byte segmentPins[] = {6, 7, 8, 9, 10, 11, 12, 13};               //Die Pins zu den //Segmenten werden festgelegt
   sevseg.begin(COMMON_CATHODE, numDigits, digitPins, segmentPins); //In diesem
                                                                    //Abschnitt kann man nun entweder testen welche Art von Display man besitzt oder
@@ -28,7 +28,7 @@ void setup()
                                                                    //COMMON_ANODE Display handelt. Das Display funktioniert nur wenn die richtige
                                                                    //Art eingetragen ist, ansonsten werden alle Segmente gleichzeitig leuchten.
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   pinMode(LED_BUILTIN, OUTPUT);
 
   grinder.attach(1);
