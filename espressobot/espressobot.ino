@@ -1,10 +1,6 @@
-#include <Servo.h>
 #include "SevSeg.h" //Die vorher hinzugefügte Library laden
 
 SevSeg sevseg; //Ein sieben Segment Objekt initialisieren
-Servo grinder; // Servo, der nickt
-
-int servoInitState = 0;
 
 long duration = 5000; // variable to store the value coming from the sensor
 int potPin = 2;       // select the input pin for the potentiometer
@@ -29,8 +25,6 @@ void setup()
   // set the digital pin as output:
   pinMode(ledPin, OUTPUT);
   pinMode(relaisPin, OUTPUT);
-
-  grinder.write(servoInitState);
 
   byte numDigits = 2;                                              //Hier wird die Anzahl der Ziffern angegeben
   byte digitPins[] = {4, 5, 2, 3};                                 //Die Pins zu den Ziffern werden festgelegt
@@ -66,8 +60,6 @@ void loop()
   //0 wäre der Punkt ganz rechts neben der letzten Ziffer. Wenn man keinen Punkt
   //mit angezeigt haben möcht kann man z.B. 4 angeben.
 
-  sevseg.refreshDisplay(); // Dieser Teil lässt die Nummer auf dem Display
-
   unsigned long currentMillis = millis();
 
   if (currentMillis - previousMillis >= duration)
@@ -89,4 +81,5 @@ void loop()
     digitalWrite(ledPin, ledState);
     digitalWrite(relaisPin, ledState);
   }
+  sevseg.refreshDisplay(); // Dieser Teil lässt die Nummer auf dem Display
 }
