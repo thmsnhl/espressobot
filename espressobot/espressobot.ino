@@ -6,24 +6,30 @@ Servo grinder; // Servo, der nickt
 
 int servoInitState = 0;
 
-long duration = 0; // variable to store the value coming from the sensor
-int potPin = 2;    // select the input pin for the potentiometer
+long duration = 5000; // variable to store the value coming from the sensor
+int potPin = 2;       // select the input pin for the potentiometer
+int relaisPin = A1;   // select the input pin for the potentiometer
 long potValue = 0;
 int durationInSeconds = 5;
 
-int ledState = LOW;
+// constants won't change. Used here to set a pin number:
+const int ledPin = LED_BUILTIN; // the number of the LED pin
+
+// Variables will change:
+int ledState = LOW; // ledState used to set the LED
+
 // Generally, you should use "unsigned long" for variables that hold time
 // The value will quickly become too large for an int to store
 unsigned long previousMillis = 0; // will store last time LED was updated
 
-void initServo()
-{
-  grinder.write(servoInitState);
-}
-
 void setup()
 {
-  grinder.attach(1);
+  Serial.begin(115200);
+
+  // set the digital pin as output:
+  pinMode(ledPin, OUTPUT);
+  pinMode(relaisPin, OUTPUT);
+
   grinder.write(servoInitState);
 
   byte numDigits = 2;                                              //Hier wird die Anzahl der Ziffern angegeben
@@ -35,61 +41,15 @@ void setup()
                                                                    //COMMON_ANODE Display handelt. Das Display funktioniert nur wenn die richtige
                                                                    //Art eingetragen ist, ansonsten werden alle Segmente gleichzeitig leuchten.
 
-  Serial.begin(115200);
-  pinMode(LED_BUILTIN, OUTPUT);
-}
-
-void turnOn()
-{
-  digitalWrite(LED_BUILTIN, HIGH);
-  grinder.write(120);
-  // delay(15);
-  // for (pos = 120; pos <= 0; pos -= 2)
-  // { // goes from 0 degrees to 180 degrees
-  //   // in steps of 1 degree
-  //   grinder.write(pos); // tell servo to go to position in variable 'pos'
-  //   delay(15);          // waits 15ms for the servo to reach the position
-  // }
-}
-
-void turnOff()
-{
-  digitalWrite(LED_BUILTIN, LOW);
-  grinder.write(servoInitState);
-  // delay(15);
-
-  // for (pos = 0; pos <= 120; pos += 2)
-  // { // goes from 0 degrees to 180 degrees
-  //   // in steps of 1 degree
-  //   grinder.write(pos); // tell servo to go to position in variable 'pos'
-  //   delay(15);          // waits 15ms for the servo to reach the position
-  // }
-}
-
-long calcDuration()
-{
-  // Serial.println("PotValue:" + potValue);
-  // 40 = 1023 / 25 (seconds)
-  duration = (potValue / 40) * 1000 + 5000;
-  Serial.println("Duration");
-  Serial.println(duration);
-  Serial.println("PotValue: ");
-  Serial.println(potValue);
-  Serial.println("");
-
-  durationInSeconds = duration / 1000;
-
-  return duration;
+  sevseg.setBrightness(100); //Hier kann die Helligkeit des Displays angepasst
+                             //werden. In einem Bereich von 0-100 wobei 100 das Hellste ist. 0 bedeutet
+                             //jedoch nicht dass das Display komplett dunkel ist. Für die Anzeige einer Zahl
+                             //ist allein die "sevseg.refreshDisplay();" Zeile verantwortlich
 }
 
 void loop()
 {
   // here is where you'd put code that needs to be running all the time.
-
-  // check to see if it's time to blink the LED; that is, if the difference
-  // between the current time and last time you blinked the LED is bigger than
-  // the interval at which you want to blink the LED.
-  unsigned long currentMillis = millis();
 
   // Value of the poti
   potValue = analogRead(potPin);
@@ -99,42 +59,34 @@ void loop()
 
   // Set the time for the display
   durationInSeconds = duration / 1000;
-  // calcDuration();
-
-  // ######## ######## ######## ########
 
   sevseg.setNumber(durationInSeconds, 4); //Hier können wir nun die gewünschte Zahl eintragen.
   //Wir haben als Beispiel 1234 angegeben. Die Zahl hinter dem Komma steht für den
   //Punkt hinter einer Ziffer. Hierbei ist 3 der Punkt neben der ersten Ziffer und
   //0 wäre der Punkt ganz rechts neben der letzten Ziffer. Wenn man keinen Punkt
   //mit angezeigt haben möcht kann man z.B. 4 angeben.
+
   sevseg.refreshDisplay(); // Dieser Teil lässt die Nummer auf dem Display
-  //erscheinen.
-  sevseg.setBrightness(100); //Hier kann die Helligkeit des Displays angepasst
-                             //werden. In einem Bereich von 0-100 wobei 100 das Hellste ist. 0 bedeutet
-                             //jedoch nicht dass das Display komplett dunkel ist. Für die Anzeige einer Zahl
-                             //ist allein die "sevseg.refreshDisplay();" Zeile verantwortlich
+
+  unsigned long currentMillis = millis();
 
   if (currentMillis - previousMillis >= duration)
   {
     // save the last time you blinked the LED
     previousMillis = currentMillis;
 
-    Serial.println("Check");
-    Serial.println(currentMillis);
-    Serial.println(duration);
-
     // if the LED is off turn it on and vice-versa:
     if (ledState == LOW)
     {
-      grinder.write(0);
+      ledState = HIGH;
     }
     else
     {
-      // turnOff();
+      ledState = LOW;
     }
 
     // set the LED with the ledState of the variable:
-    digitalWrite(LED_BUILTIN, ledState);
+    digitalWrite(ledPin, ledState);
+    digitalWrite(relaisPin, ledState);
   }
 }
